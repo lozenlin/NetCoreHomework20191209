@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EFCoreDemo.Models;
+using EFCoreDemo.Models.Params;
 
 namespace EFCoreDemo.Controllers
 {
@@ -85,6 +86,19 @@ namespace EFCoreDemo.Controllers
             return CreatedAtAction("GetDepartment", new { id = department.DepartmentId }, department);
         }
 
+        [HttpPost("Insert")]
+        public async Task<ActionResult<DeptInsResult>> PostDepartmentSP(DeptInsParams deptIns)
+        {
+            var result = await _context.DeptInsResult.FromSqlRaw("[dbo].[Department_Insert] @p0, @p1, @p2, @p3",
+                deptIns.Name,
+                deptIns.Budget,
+                deptIns.StartDate,
+                deptIns.InstructorId
+            ).ToListAsync();
+
+            return result.FirstOrDefault();
+        }
+
         // DELETE: api/Departments/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Department>> DeleteDepartment(int id)
@@ -97,6 +111,22 @@ namespace EFCoreDemo.Controllers
 
             _context.Department.Remove(department);
             await _context.SaveChangesAsync();
+
+            return department;
+        }
+
+        [HttpDelete("Delete/{id}")]
+        public async Task<ActionResult<Department>> DeleteDepartmentSP(int id)
+        {
+            var department = await _context.Department.FindAsync(id);
+            if (department == null)
+            {
+                return NotFound();
+            }
+
+            _context.Database.ExecuteSqlRaw("[dbo].[Department_Delete] @p0, @p1",
+                department.DepartmentId,
+                department.RowVersion);
 
             return department;
         }

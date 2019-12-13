@@ -19,6 +19,7 @@ namespace EFCoreDemo.Models
         public virtual DbSet<Course> Course { get; set; }
         public virtual DbSet<CourseInstructor> CourseInstructor { get; set; }
         public virtual DbSet<Department> Department { get; set; }
+        public virtual DbSet<DeptInsResult> DeptInsResult { get; set; }
         public virtual DbSet<Enrollment> Enrollment { get; set; }
         public virtual DbSet<OfficeAssignment> OfficeAssignment { get; set; }
         public virtual DbSet<Person> Person { get; set; }
@@ -81,6 +82,10 @@ namespace EFCoreDemo.Models
                     .WithMany(p => p.Department)
                     .HasForeignKey(d => d.InstructorId)
                     .HasConstraintName("FK_dbo.Department_dbo.Instructor_InstructorID");
+            });
+
+            modelBuilder.Entity<DeptInsResult>(entity => {
+                entity.HasNoKey();
             });
 
             modelBuilder.Entity<Enrollment>(entity =>
